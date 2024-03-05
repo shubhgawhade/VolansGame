@@ -34,6 +34,7 @@ public class InteractableDetector : MonoBehaviour
             if(Input.GetMouseButtonDown(1))
             {
                 currentInteractable.OnEndInspect();
+                currentInteractable.isInteracting = false;
                 playerManager.ChangeState(PlayerStates.FreeRoam);
             }
             
@@ -66,6 +67,7 @@ public class InteractableDetector : MonoBehaviour
                     // hit.transform.GetComponent<Interactable>().enabled = true;
                     currentInteractable.DisableOutline();
                     currentInteractable.OnInspect();
+                    currentInteractable.isInteracting = true;
                     playerManager.ChangeState(PlayerStates.Inspector);
                 }
                 

@@ -6,7 +6,15 @@ public class InteractablesManager : MonoBehaviour
     [SerializeField] private GameObject player;
     [SerializeField] private CinemachineVirtualCamera inspectorCam;
 
+    [SerializeField] protected bool hasStartAnimation;
+    [SerializeField] protected bool hasUI;
+
+    [SerializeField] protected GameObject ui;
+
     // private PlayerManager playerManager;
+    
+    
+    public bool isInteracting;
 
     private void Awake()
     {
