@@ -2,7 +2,6 @@ using System;
 using System.Text;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 public class TextReader : MonoBehaviour
 {
@@ -14,6 +13,10 @@ public class TextReader : MonoBehaviour
     // public string currentSpeaker;
     public string[] currentDialogue;
     public string[] lines;
+
+    public string[] vars;
+    
+    public string dialogue;
     public bool nextDialogue;
     public int dialogueTracker;
 
@@ -35,31 +38,32 @@ public class TextReader : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
-    {
-        if (textAsset != previousTextAsset)
-        {
-            LoadScript();
-            previousTextAsset = textAsset;
-            
-            // ToggleUI();
-        }
-
-        ParseUI();
-
-        if (Input.GetMouseButtonDown(0))
-        {
-            LoadScript();
-
-            NextDialogue();
-        }
-
-        if (Input.GetKeyDown(KeyCode.P))
-        {
-            textAsset = textAsset2;
-            // ToggleUI();
-        }
-    }
+    // void Update()
+    // {
+    //     if (textAsset != previousTextAsset)
+    //     {
+    //         LoadScript();
+    //         previousTextAsset = textAsset;
+    //         dialogueTracker = 0;
+    //         NextDialogue();
+    //         // ToggleUI();
+    //     }
+    //
+    //     ParseUI();
+    //
+    //     if (Input.GetMouseButtonDown(0))
+    //     {
+    //         LoadScript();
+    //
+    //         NextDialogue();
+    //     }
+    //
+    //     if (Input.GetKeyDown(KeyCode.P))
+    //     {
+    //         textAsset = textAsset2;
+    //         // ToggleUI();
+    //     }
+    // }
     
     public void NextDialogue()
     {
@@ -79,6 +83,18 @@ public class TextReader : MonoBehaviour
     public void ToggleUI()
     {
         textGUI.gameObject.SetActive(!textGUI.gameObject.activeSelf);
+    }
+
+    public void ParseUI(string line)
+    {
+        textGUI.text = "";
+        lineAdd.Clear();
+        currentDialogue = line.Split("$", StringSplitOptions.RemoveEmptyEntries);
+        foreach (string s in currentDialogue)
+        {
+            lineAdd.AppendLine(s);
+            textGUI.text = lineAdd.ToString();
+        }
     }
 
     public void ParseUI()
@@ -120,6 +136,15 @@ public class TextReader : MonoBehaviour
     {    
         strB = new StringBuilder(textAsset.text);
         lines = strB.ToString().Split("\n");
+
+        // dialogue = variables[0];
+
+        // vars = new string[lines.Length];
+        // for (int i = 0; i < lines.Length; i++)
+        // {
+        //     vars[i] = lines[i].Split('"', StringSplitOptions.RemoveEmptyEntries)[1];
+        // }
+        
         // speakers = new string[lines.Length];
     
         for (int i = 0; i < lines.Length; i++)

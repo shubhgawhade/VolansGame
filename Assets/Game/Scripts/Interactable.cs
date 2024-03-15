@@ -39,7 +39,7 @@ public class Interactable : InteractablesManager
     {
         base.InteractableControls();
         
-        print(gameObject.name + " CONTROLS");
+        // print(gameObject.name + " CONTROLS");
 
         if (hasStartAnimation)
         {

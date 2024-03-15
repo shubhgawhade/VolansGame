@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
@@ -49,7 +50,7 @@ public class TypewriterEffect : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            counter = numOfVisibleCharacters + 1;
+            counter = numOfVisibleCharacters - 1;
             textGUI.maxVisibleCharacters = numOfVisibleCharacters;
         }
     }
@@ -58,12 +59,12 @@ public class TypewriterEffect : MonoBehaviour
     {
         counter = 0;
 
-        print(textGUI.textInfo.characterCount);
+        // print(textGUI.textInfo.characterCount);
         numOfVisibleCharacters = textGUI.textInfo.characterCount;
 
         for (int i = 0; i < numOfVisibleCharacters; i++)
         {
-            print(textGUI.textInfo.characterInfo[i].character);
+            // print(textGUI.textInfo.characterInfo[i].character);
         }
 
         while (counter < numOfVisibleCharacters)

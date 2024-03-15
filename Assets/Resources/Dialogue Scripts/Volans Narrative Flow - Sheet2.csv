@@ -1,0 +1,18 @@
+,Marx,0,,,...,,
+,Detective,0,,,"Before we get started, let me just run through your miranda rights Dr.Marx. It's just protocol, ok?",,
+,Marx,0,,,...,,
+,Detective,0,,,Do you understand what I have just read to you?,,
+,Detective,0,,,"So...I heared you play a large part at Dionysus Firm in hill town. You're in charge of exportation, right? For biotechnology and pharmaceuticals for the XL Beastial subtype of monsters. You do good work in the progression of the medical industry, a staple of what your species is capable of.",,
+,Marx,0,,,*cricket noises*,,
+,Detective,1,4,,,,
+,,0,,,Help me get to know you.,0,11
+,,0,,,Please recall the events,1,12
+,,0,,,Your rights to privacy in this case don't apply,2,13
+,,0,,,End Interrogation,,0
+,Marx,0,,,I'm Nobody,,16
+,Marx,0,,,Nothing interesting. It was uneventful,,15
+,Marx,0,,,I think we are done with this conversation,,
+,Detective,0,,,*DAY OVER*,,0
+,Detective,0,,,I need you to try harder to remember,,17
+,Detective,0,,,But you're not a nobody. you're a little bit of a celebrity in our community.,,
+,Detective,0,,,*DAY OVER*,,0

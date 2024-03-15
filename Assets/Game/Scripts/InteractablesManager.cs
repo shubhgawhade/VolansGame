@@ -35,7 +35,7 @@ public class InteractablesManager : MonoBehaviour
     
     protected virtual void InteractableControls()
     {
-        print("DEFAULT CONTROLS");
+        // print("DEFAULT CONTROLS");
     }
 
     public CinemachineVirtualCamera ReturnInspectorCamera()
