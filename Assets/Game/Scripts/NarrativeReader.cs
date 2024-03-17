@@ -23,22 +23,25 @@ public class NarrativeReader : MonoBehaviour
     public DataLink[] dataLink;
 
     private int numOfRows;
-
-    public string[] dialogue;
+    
+    public int extraCommaCounter;
     
     void Awake()
     {
+        // Load the CSV file as a string
         fullstring = new StringBuilder(narrative.text);
         rows = fullstring.ToString().Split("\n");
 
         dataLink = new DataLink[rows.Length];
+        
+        // Go through each row
         for (int row = 0; row < rows.Length; row++)
         {
             NarrativeData tempNarrativeData = new NarrativeData();
 
             print($"Line {row} : {rows[row]}");
-
             
+            // Loop through the 8 columns in each row
             for (int column = 0; column < 8; column++)
             {
                 switch (column)
@@ -117,9 +120,38 @@ public class NarrativeReader : MonoBehaviour
                     
                     
                     case 4:
-                    
-                        string rawPrereq = rows[row].Split(",")[column];
 
+                        string rawPrereq;
+                        string rawRowData1 = rows[row];
+                        
+                        // Gets the position of the character for the current column
+                        int characterPosition1 = GetColumnCharacterIndex(rawRowData1, column);
+                        
+                        if (characterPosition1 == -1)
+                        {
+                            Debug.LogWarning("CHARACTER POSITION FOR COLUMN NOT FOUND");
+                            
+                            return;
+                        }
+
+                        // READ DATA IF THE FIRST CHARACTER IS NOT DOUBLE QUOTES
+                        // If there aren't double quotes, read data from this column
+                        if (rawRowData1[characterPosition1 + 1].ToString() != "\"")
+                        {
+                            rawPrereq = rows[row].Split(",")[column];
+                                    
+                            print($"Line {row} : PREREQ DOESN'T HAVE DOUBLE QUOTES {rawPrereq}");
+                                    
+                            tempNarrativeData.prereq = rawPrereq;
+                            break;
+                        }
+                        
+                        // If there are enclosed in double quotes, the column data contains a comma. return the text
+                        // Every column after this function needs to account for any extra commas in the row
+                        // extraCommaCounter must be added to the column value
+                        rawPrereq = ReturnTextFromQuotes(rawRowData1, characterPosition1, column);
+                        
+                        print($"Line {row} : PREREQ: {rawPrereq}");
                         tempNarrativeData.prereq = rawPrereq;
                         
                         break;
@@ -127,68 +159,42 @@ public class NarrativeReader : MonoBehaviour
                     case 5:
 
                         string rawRowData = rows[row];
-                        string rawDialogue = null;
-                        int counter = 0;
+                        string rawDialogue;
 
-                        for (int i = 0; i < rawRowData.Length; i++)
+                        // Gets the position of the character for the current column
+                        // The previous value might've had commas enclosed in double quotes
+                        // extraCommaCounter accounts for the extra commas to find the right character location
+                        int characterPosition = GetColumnCharacterIndex(rawRowData, column + extraCommaCounter);
+                        
+                        if (characterPosition == -1)
                         {
-                            if (rawRowData[i].ToString() == ",")
-                            {
-                                counter++;
-                            }
-
-                            // Read from the 5th column
-                            if (counter == column)
-                            {
-                                int doubleQuotes = 0;
-                                for (int j = i + 1; j < rawRowData.Length; j++)
-                                {
-                                    if (rawRowData[j].ToString() == "\"")
-                                    {
-                                        doubleQuotes++;
-                                        j++;
-                                    }
-
-                                    // Start of dialogue
-                                    if (doubleQuotes == 1)
-                                    {
-                                        rawDialogue += rawRowData[j].ToString();
-                                    }
-                                    // End of dialogue
-                                    else if(doubleQuotes == 2)
-                                    {
-                                        
-                                        break;
-                                    }
-                                    
-                                    // print(rawRowData[j]);
-                                }
-                                
-                                print(rawDialogue);
-                                if (rawDialogue == null)
-                                {
-                                    rawDialogue = rows[row].Split(",")[column];
-                                    
-                                    print($"Line {row} : DIALOGUE DOESN'T HAVE DOUBLE QUOTES {rawDialogue}");
-                                    
-                                    tempNarrativeData.dialogue = rawDialogue;
-                                }
-                                else
-                                {
-                                    print($"Line {row} : DIALOGUE: {rawDialogue}");
-                                    tempNarrativeData.dialogue = rawDialogue;
-                                }
-                                
-                                break;
-                            } 
+                            Debug.LogWarning("CHARACTER POSITION FOR COLUMN NOT FOUND");
+                            
+                            return;
                         }
+
+                        // READ DATA IF THE FIRST CHARACTER IS NOT DOUBLE QUOTES
+                        if (rawRowData[characterPosition + 1].ToString() != "\"")
+                        {
+                            rawDialogue = rows[row].Split(",")[column + extraCommaCounter];
+                                    
+                            print($"Line {row} : DIALOGUE DOESN'T HAVE DOUBLE QUOTES {rawDialogue}");
+                                    
+                            tempNarrativeData.dialogue = rawDialogue;
+                            break;
+                        }
+                        
+                        rawDialogue = ReturnTextFromQuotes(rawRowData, characterPosition, column+extraCommaCounter);
+                        
+                        print($"Line {row} : DIALOGUE: {rawDialogue}");
+                        tempNarrativeData.dialogue = rawDialogue;
                             
                         break;
                     
                         
                     case 6:
 
-                        string rawAnxietyLevel = rows[row].Split(",")[column];
+                        string rawAnxietyLevel = rows[row].Split(",")[column + extraCommaCounter];
 
                         int.TryParse(rawAnxietyLevel, out tempNarrativeData.anxietyLevel);
                             
@@ -196,9 +202,14 @@ public class NarrativeReader : MonoBehaviour
                     
 
                     case 7:
+
+                        string rawlinkID;
                         
                         // Next dialogue link ID
-                        string rawlinkID = rows[row].Split(",")[column];
+                        // rawlinkID = rows[row].Split(",")[column];
+                        // print($"COUNTER : {extraCommaCounter} Line {row}");
+                        rawlinkID = rows[row].Split(",")[column + extraCommaCounter];
+                        
 
                         if (int.TryParse(rawlinkID, out tempNarrativeData.linkId))
                         {
@@ -210,26 +221,12 @@ public class NarrativeReader : MonoBehaviour
                             tempNarrativeData.linkId = -1;
                         }
 
-                        // if (tempNarrativeData.linkId == 0)
-                        // {
-                        //     tempNarrativeData.linkId = -1;
-                        // }
+                        // Reset the counter for the next row
+                        extraCommaCounter = 0;
                         
                         break;
                 }
             }
-            
-            // NarrativeData tempNarrativeData = new NarrativeData
-            // {
-            //     id = int.Parse(rows[i].Split(",")[0]),
-            //     speaker = rows[i].Split(",")[1],
-            //     hasChoice = ReturnHasChoice(int.Parse(rows[i].Split(",")[2])),
-            //     numOfChoices = int.Parse(rows[i].Split(",")[3]),
-            //     prereq = rows[i].Split(",")[4],
-            //     dialogue = rows[i].Split(",")[5],
-            //     anxietyLevel = int.Parse(rows[i].Split(",")[6]),
-            //     linkId = int.Parse(rows[i].Split(",")[7])
-            // };
 
             dataLink[row] = new DataLink
             {
@@ -237,6 +234,63 @@ public class NarrativeReader : MonoBehaviour
                 narrativeData = tempNarrativeData
             };
         }
+    }
+
+    // Gets the position of the character for the current column
+    public int GetColumnCharacterIndex(string rawRowData, int column)
+    {
+        int commaCounter = 0;
+
+        for (int i = 0; i < rawRowData.Length; i++)
+        {
+            if (rawRowData[i].ToString() == ",")
+            {
+                commaCounter++;
+            }
+
+            // print($"COLUMN : {commaCounter}, {column}");
+            // Return the position of the comma at the given column
+            if (commaCounter == column)
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    // Returns the text between double quotes
+    public string ReturnTextFromQuotes(string rawRowData, int startIndex, int column)
+    {
+        int doubleQuotes = 0;
+        string rawDialogue = "";
+        for (int j = startIndex + 1; j < rawRowData.Length; j++)
+        {
+            if (rawRowData[j].ToString() == "\"")
+            {
+                doubleQuotes++;
+                j++;
+            }
+
+            // Start of dialogue
+            if (doubleQuotes == 1)
+            {
+                if (rawRowData[j].ToString() == ",")
+                {
+                    extraCommaCounter++;
+                }
+                // print($"{rawRowData[j]}, COUNTER : {extraCommaCounter} : {column}");
+                                        
+                rawDialogue += rawRowData[j].ToString();
+            }
+            // End of dialogue
+            else if(doubleQuotes == 2)
+            {
+                break;
+            }
+        }
+        
+        return rawDialogue;
     }
 
     public bool ReturnHasChoice(int choice)
